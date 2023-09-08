@@ -1,0 +1,25 @@
+const words = [
+    'tool',
+    'Aberration',
+    'Capitulate',
+    'Debilitate',
+    // 'Enervate',
+    // 'Facetious',
+    // 'Garrulous',
+    // 'Harangue',
+    // 'Ineffable',
+    // 'Juxtapose',
+    // 'Kaleidoscope',
+    // 'Lugubrious',
+    // 'Munificent',
+    // 'Nefarious',
+    // 'Obfuscate',
+    // 'Pernicious',
+    // 'Quintessential',
+    // 'Recalcitrant',
+    // 'Sycophant',
+    // 'Trepidation',
+    // 'Ubiquitous',
+]
+
+export default words
