@@ -10,6 +10,7 @@ import UserAccountNav from './UserAccountNav'
 
 type Props = {}
 
+
 const Navbar = async (props: Props) => {
     
     const session = await getAuthSession()

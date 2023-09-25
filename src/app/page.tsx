@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db'
 import { getAuthSession } from '@/lib/nextauth'
 import { cn } from '@/lib/utils'
 import { redirect } from 'next/navigation'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import react, { useState } from 'react'
 async function Home() {
     const session = await getAuthSession()

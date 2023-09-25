@@ -1,8 +1,8 @@
 const words = [
     'tool',
     'Aberration',
-    'Capitulate',
-    'Debilitate',
+    // 'Capitulate',
+    // 'Debilitate',
     // 'Enervate',
     // 'Facetious',
     // 'Garrulous',

@@ -9,7 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import { GoSignOut } from 'react-icons/go'
 import { BiUser } from 'react-icons/bi'
 import { LuSettings } from 'react-icons/lu'

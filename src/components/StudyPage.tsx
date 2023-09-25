@@ -18,7 +18,6 @@ type Props = {
 //--->on any list change we update local storage
 //--->if we dont have a def, we fetch it
 
-
 const StudyPage: React.FC<Props> = ({ words }) => {
     const StudyChoices = ['Flashcard', 'Multiple Choice', 'Text Input']
     const [studyChoice, setStudyChoice] = useState('Flashcard')
@@ -30,41 +29,6 @@ const StudyPage: React.FC<Props> = ({ words }) => {
         null
     )
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
-
-    const fetchDefinition = useCallback(async () => {
-        try {
-            const response = await fetch(
-                `https://api.dictionaryapi.dev/api/v2/entries/en/${words[currentIndex]}`
-            )
-            const data = await response.json()
-            if (data && data.length > 0) {
-                const firstMeaning = data[0].meanings[0]
-                if (
-                    firstMeaning &&
-                    firstMeaning.definitions &&
-                    firstMeaning.definitions.length > 0
-                ) {
-                    setCurrentDefinition(firstMeaning.definitions[0].definition)
-                    if (data[0].phonetics[0]?.audio) {
-                        const audio = new Audio(data[0].phonetics[0].audio)
-                        setAudio(audio)
-                    } else {
-                        setAudio(null)
-                    }
-                }
-            } else {
-                console.error(`${words[currentIndex]}: No definition found.`)
-            }
-        } catch (error) {
-            console.error(
-                `Failed to fetch definition for ${words[currentIndex]}: ${error}`
-            )
-        }
-    }, [currentIndex, words])
-
-    useEffect(() => {
-        fetchDefinition()
-    }, [currentIndex, fetchDefinition])
 
     const handleNextWord = () =>
         setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length)
@@ -106,7 +70,6 @@ const StudyPage: React.FC<Props> = ({ words }) => {
         setShowAnswer(true)
         inputRef.current?.blur()
     }
-
     return (
         <div className="flex flex-col items-center justify-start w-screen h-screen gap-5 py-20">
             <div className="flex items-center justify-center w-fit rounded-md bg-gray-300 p-2">

@@ -2,7 +2,27 @@ import StudyPage from '@/components/StudyPage'
 import { prisma } from '@/lib/db'
 import { getAuthSession } from '@/lib/nextauth'
 import { redirect } from 'next/navigation'
-import words from '@/lib/tempConsts'
+import words from '@/lib/seedWords'
+
+type Definition = {
+    id: string
+    definition: string
+    meaningId: string
+}
+
+type Meaning = {
+    id: string
+    partOfSpeech: string
+    wordId: string
+    definitions: Definition[]
+}
+
+type WordData = {
+    id: string
+    word: string
+    pronunciation: string | null
+    meanings: Meaning[]
+}
 
 async function fetchFromAPI(word: string) {
     let wordData = null
@@ -26,7 +46,7 @@ async function fetchFromAPI(word: string) {
     return wordData
 }
 
-async function checkWordDB(word: string) {
+async function DBwordFetch(word: string) {
     const fetchedWord = await prisma.word.findUnique({
         where: {
             word: word,
@@ -79,17 +99,34 @@ async function addWordToDatabase(word: string) {
     }
 }
 
+function simplifyWordData(wordData: WordData[]) {
+    return wordData.map((word) => {
+        const firstMeaning = word.meanings[0] // Get the first meaning object
+        const firstDefinition = firstMeaning
+            ? firstMeaning.definitions[0]
+            : null // Get the first definition from the first meaning
+        const partOfSpeech = firstMeaning ? firstMeaning.partOfSpeech : null // Get the part of speech from the first meaning
+
+        return {
+            word: word.word,
+            pronunciation: word.pronunciation,
+            partOfSpeech: partOfSpeech,
+            definition: firstDefinition ? firstDefinition.definition : null,
+        }
+    })
+}
+
 async function fetchWords(words: string[]) {
     let wordData = []
     for (const word of words) {
-        const DBwordData = await checkWordDB(word)
+        const DBwordData = await DBwordFetch(word)
         if (DBwordData) {
             console.log(`${word} exists in the database, fetching...`)
             wordData.push(DBwordData)
         } else {
             console.log(`${word} not in DB, making API call...`)
-            const newWordData = await addWordToDatabase(word)
-            const DBwordData = await checkWordDB(word)
+            await addWordToDatabase(word)
+            const DBwordData = await DBwordFetch(word)
             if (DBwordData) {
                 console.log(
                     `newly added word ${word} is now in database, fetching...`
@@ -97,9 +134,21 @@ async function fetchWords(words: string[]) {
                 wordData.push(DBwordData)
             }
         }
-        wordData.map((word) => console.log('word', word.word))
     }
+    const simpleData = simplifyWordData(wordData)
+    return simpleData
 }
+async function fetchWordListFromDB() {
+    const wordListFromDB = await prisma.word.findMany({
+        select: {
+            word: true, // Only select the 'word' field
+        },
+    })
+    // Convert the array of objects to an array of strings
+    const wordArray = wordListFromDB.map((wordObj) => wordObj.word)
+    return wordArray
+}
+
 // async function logAllWords() {
 //     const allWords = await prisma.word.findMany({
 //         include: {
@@ -109,42 +158,6 @@ async function fetchWords(words: string[]) {
 //     console.log('All words in the database:', allWords)
 // }
 
-// async function findWordDefinition() {
-//     try {
-//         // Find the word "word" and its associated meanings and definitions
-//         const word = await prisma.word.findUnique({
-//             where: {
-//                 text: 'word',
-//             },
-//             include: {
-//                 meanings: {
-//                     include: {
-//                         definitions: true,
-//                     },
-//                 },
-//             },
-//         })
-
-//         if (!word) {
-//             console.log('The word "word" was not found in the database.')
-//             return
-//         }
-
-//         console.log(`Word: ${word.text}`)
-//         word.meanings.forEach((meaning, index) => {
-//             console.log(`  Meaning ${index + 1} (${meaning.partOfSpeech}):`)
-//             meaning.definitions.forEach((definition, defIndex) => {
-//                 console.log(
-//                     `    Definition ${defIndex + 1}: ${definition.text}`
-//                 )
-//             })
-//         })
-//     } catch (error) {
-//         console.error('An error occurred:', error)
-//     } finally {
-//         await prisma.$disconnect()
-//     }
-// }
 async function cleanDatabase() {
     try {
         // Delete child records first to satisfy foreign key constraints
@@ -162,9 +175,11 @@ async function cleanDatabase() {
     }
 }
 
+
 export async function Home() {
     // main()
-    fetchWords(words)
+    await fetchWords(words)
+    const wordList = await fetchWordListFromDB()
     // cleanDatabase()
     const session = await getAuthSession()
     if (!session?.user) {
@@ -173,7 +188,7 @@ export async function Home() {
 
     return (
         <div>
-            <StudyPage words={words} />
+            <StudyPage words={wordList} />
         </div>
     )
 }

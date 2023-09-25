@@ -1,0 +1,66 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import { prisma } from '@/lib/db'
+
+// type Definition = {
+//     id: string
+//     definition: string
+//     meaningId: string
+// }
+
+// type Meaning = {
+//     id: string
+//     partOfSpeech: string
+//     wordId: string
+//     definitions: Definition[]
+// }
+
+// type WordData = {
+//     id: string
+//     word: string
+//     pronunciation: string | null
+//     meanings: Meaning[]
+// }
+
+// function simplifyWordData(wordData: WordData[]) {
+//     return wordData.map((word) => {
+//         const firstMeaning = word.meanings[0]
+//         const firstDefinition = firstMeaning
+//             ? firstMeaning.definitions[0]
+//             : null
+//         const partOfSpeech = firstMeaning ? firstMeaning.partOfSpeech : null
+
+//         return {
+//             word: word.word,
+//             pronunciation: word.pronunciation,
+//             partOfSpeech: partOfSpeech,
+//             definition: firstDefinition ? firstDefinition.definition : null,
+//         }
+//     })
+// }
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    console.log('testtttting call')
+    // const word = await prisma.word.findUnique({
+    //     where: {
+    //         word: req.query.word as string,
+    //     },
+    //     include: {
+    //         meanings: {
+    //             include: {
+    //                 definitions: true,
+    //             },
+    //         },
+    //     },
+    // })
+
+    // if (word) {
+    //     const simplifiedWord = simplifyWordData([word]) // Wrap the single word object in an array
+    //     console.log(simplifiedWord[0])
+    //     res.json(simplifiedWord[0]) // Send back the first (and only) simplified word data
+    // } else {
+    //     res.status(404).json({ message: 'Word not found' })
+    // }
+}
